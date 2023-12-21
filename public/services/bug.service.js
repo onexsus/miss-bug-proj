@@ -38,8 +38,8 @@ function save(bug) {
     // let queryParams = `?title=${bug.title}&description=${bug.description}&severity=${bug.severity}`
     // if (bug._id) queryParams += `&_id=${bug._id}`
     // return axios.get(url + queryParams)
-    const method = car._id ? 'put' : 'post'
-    return axios[method](BASE_URL, car).then(res => res.data)
+    const method = bug._id ? 'put' : 'post'
+    return axios[method](BASE_URL, bug).then(res => res.data)
 }
 
 
