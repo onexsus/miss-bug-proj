@@ -13,16 +13,26 @@ app.use(express.json());
 
 //  routing express
 // List
-app.get("/api/bug", (req, res) => {
-  bugService.query()
-    .then((bugs) => {
-      res.send(bugs);
-    })
-    .catch((err) => {
-      loggerService.error("Cannot get bugs", err);
-      res.status(400).send("Cannot get bugs");
-    });
-});
+app.get('/api/bug', (req, res) => {
+
+  const { txt = '', minSeverity = 0, label = '', pageIdx, sortBy = '', sortDir = 1 } = req.query
+  const filterBy = {
+      txt,
+      minSeverity,
+      label,
+      pageIdx
+  }
+  
+  bugService.query(filterBy, sortBy, sortDir)
+        .then(({ bugs, maxPage }) => {
+            // console.log('maxPage', maxPage)
+            res.send({ bugs, maxPage })
+        })
+        .catch(err => {
+            loggerService.error('Cannot get bugs', err)
+            res.status(400).send('Cannot get bugs')
+        })
+})
 
 //Save
 // app.get("/api/bug/save", (req, res) => {

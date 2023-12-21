@@ -12,12 +12,16 @@ export const bugService = {
     getById,
     save,
     remove,
+    getDefaultFilter,
 }
 
 
-function query() {
-    // return storageService.query(STORAGE_KEY)
-    return axios.get(BASE_URL).then(res => res.data)
+function query(filterBy, sortBy = 'severity', sortDir = 1) {
+    return axios.get(BASE_URL, { params: { ...filterBy, sortBy, sortDir } })
+        .then(res => {
+            console.log('res.data',res.data)
+            return res.data
+        })
 }
 function getById(bugId) {
     return axios.get(BASE_URL + bugId).then(res => res.data)
@@ -40,6 +44,10 @@ function save(bug) {
     // return axios.get(url + queryParams)
     const method = bug._id ? 'put' : 'post'
     return axios[method](BASE_URL, bug).then(res => res.data)
+}
+
+function getDefaultFilter() {
+    return { txt: '', minSeverity: '', label: '', pageIdx: 0 }
 }
 
 

@@ -9,13 +9,37 @@ export const bugService = {
   save
 }
 
+const PAGE_SIZE = 3
 const bugs = utilService.readJsonFile('data/bug.json')
 
 
-
-
-function query() {
-  return Promise.resolve(bugs)
+function query(filterBy = {}, sortBy, sortDir) {
+    let bugsToReturn = bugs
+    if (filterBy.txt) {
+        const regExp = new RegExp(filterBy.txt, 'i')
+        bugsToReturn = bugsToReturn.filter(bug => regExp.test(bug.title) || regExp.test(bug.description))
+    }
+    if (filterBy.minSeverity) {
+        bugsToReturn = bugsToReturn.filter(bug => bug.severity >= filterBy.minSeverity)
+    }
+    if (filterBy.label) {
+        bugsToReturn = bugsToReturn.filter(bug => bug.labels.includes(filterBy.label))
+    }
+    if (filterBy.pageIdx !== undefined) {
+        const startIdx = filterBy.pageIdx * PAGE_SIZE
+        bugsToReturn = bugsToReturn.slice(startIdx, startIdx + PAGE_SIZE)
+    }
+    if (sortBy === 'severity') { 
+        bugsToReturn.sort((b1, b2) => (b1.severity - b2.severity) * sortDir)
+    }
+    else if (sortBy === 'createdAt') { 
+        bugsToReturn.sort((b1, b2) => (b1.createdAt - b2.createdAt) * sortDir)
+    }
+    else if (sortBy === 'title') { 
+        bugsToReturn.sort((b1, b2) => (b1.title.localeCompare(b2.title) * sortDir))
+    }
+    const maxPage = Math.ceil(bugsToReturn.length / PAGE_SIZE)
+    return Promise.resolve({ bugs: bugsToReturn, maxPage })
 }
 
 function getById(bugId) {

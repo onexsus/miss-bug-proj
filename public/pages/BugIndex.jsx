@@ -1,18 +1,30 @@
 import { bugService } from '../services/bug.service.js'
+import { utilService } from '../services/util.service.js'
 import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
 import { BugList } from '../cmps/BugList.jsx'
+import { BugFilter } from "../cmps/BugFilter.jsx"
 
-const { useState, useEffect } = React
+const { useState, useEffect ,useRef } = React
 
 export function BugIndex() {
     const [bugs, setBugs] = useState(null)
+    const [filterBy, setFilterBy] = useState(bugService.getDefaultFilter())
+    const [sortBy, setSortBy] = useState('')
+    const [sortDir, setSortDir] = useState(null)
+    const [maxPage, setMaxPage] = useState(null)
+    const debounceOnSetFilter = useRef(utilService.debounce(onSetFilter, 500))
 
     useEffect(() => {
         loadBugs()
-    }, [])
+    }, [filterBy, sortBy, sortDir])
 
     function loadBugs() {
-        bugService.query().then(setBugs)
+        bugService.query(filterBy, sortBy, sortDir)
+            .then(({ bugs, maxPage: newMaxPage }) => {
+                setBugs(bugs)
+                setMaxPage(newMaxPage)
+            })
+            .catch(err => console.log('err:', err))
     }
 
     function onRemoveBug(bugId) {
@@ -69,12 +81,60 @@ export function BugIndex() {
             })
     }
 
+    function onSetFilter(filterBy) {
+        setFilterBy(prevFilter => ({ ...prevFilter, ...filterBy }))
+    }
+
+    function onSetSortBy(sortKey) {
+        setSortBy(sortKey)
+    }
+
+    function onSetSortDir(dir) {
+        setSortDir(dir)
+    }
+
+    function onChangePageIdx(diff) {
+        // console.log('maxPage',maxPage)
+        if (isUndefined(filterBy.pageIdx)) return
+        setFilterBy(prevFilter => {
+            let newPageIdx = prevFilter.pageIdx + diff
+            if (newPageIdx < 0) newPageIdx = 0
+            if (newPageIdx > maxPage) newPageIdx = maxPage + 1
+            return { ...prevFilter, pageIdx: newPageIdx }
+        })
+    }
+
+    function onTogglePagination() {
+        setFilterBy(prevFilter => {
+            return {
+                ...prevFilter,
+                pageIdx: isUndefined(prevFilter.pageIdx) ? 0 : undefined
+            }
+        })
+    }
+
+    function isUndefined(value) {
+        return value === undefined
+    }
+
+    const { txt, minSeverity, label, pageIdx } = filterBy
+
     return (
         <main>
             <h3>Bugs App</h3>
-            <main>
-                <button onClick={onAddBug}>Add Bug ⛐</button>
+            <main className='bug-index'>
+
+                <section className="pagination">
+                    <button onClick={() => onChangePageIdx(1)}>+</button>
+                    {pageIdx + 1 || 'No Pagination'}
+                    <button onClick={() => onChangePageIdx(-1)}>-</button>
+                    <button onClick={onTogglePagination}>Toggle pagination</button>
+                </section>
+
+                <BugFilter filterBy={{ txt, minSeverity, label }} onSetFilter={debounceOnSetFilter.current} onSetSortBy={onSetSortBy} onSetSortDir={onSetSortDir} sortBy={sortBy} sortDir={sortDir} />
+                <button className="add" onClick={onAddBug}>Add Bug 🐛</button>
                 <BugList bugs={bugs} onRemoveBug={onRemoveBug} onEditBug={onEditBug} />
+
             </main>
         </main>
     )
