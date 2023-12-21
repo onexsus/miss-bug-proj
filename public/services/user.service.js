@@ -7,7 +7,21 @@ export const userService = {
     signup,
     logout,
     getLoggedinUser,
-    getEmptyCredentials
+    getEmptyCredentials,
+    getUsers,
+    removeUser
+}
+
+function removeUser(userId){
+    return axios.delete('/api/user',{userId})
+}
+
+
+function getUsers(){
+    return axios.get('/api/user').then(res=>{
+        console.log(res.data )
+        res.data
+    })
 }
 
 function getLoggedinUser() {

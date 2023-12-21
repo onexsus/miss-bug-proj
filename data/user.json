@@ -1,9 +1,9 @@
 [
   {
     "_id": "u101",
-    "username": "puki",
-    "fullname": "Puki Ja",
-    "password": "secret1",
+    "username": "admin",
+    "fullname": "admin",
+    "password": "admin",
     "isAdmin": true
   },
   {

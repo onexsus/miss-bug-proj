@@ -19,6 +19,7 @@ export function BugDetails() {
                 showErrorMsg('Cannot load bug')
             })
     }, [])
+    
 
     if (!bug) return <h1>loadings....</h1>
     return bug && <div>

@@ -12,7 +12,6 @@ export const bugService = {
 const PAGE_SIZE = 3
 const bugs = utilService.readJsonFile('data/bug.json')
 
-
 function query(filterBy = {}, sortBy, sortDir) {
     let bugsToReturn = bugs
     if (filterBy.txt) {

@@ -1,7 +1,10 @@
-import { bugService } from "./services/bug.service.js";
-import { loggerService } from "./services/logger.service.js";
+import path from 'path'
 import express from "express";
 import cookieParser from "cookie-parser";
+
+import { bugService } from "./services/bug.service.js";
+import { userService } from './services/user.service.js'
+import { loggerService } from "./services/logger.service.js";
 
 const app = express();
 
@@ -140,6 +143,16 @@ app.get('/api/user', (req, res) => {
           console.log('Cannot load users', err)
           res.status(400).send('Cannot load users')
       })
+})
+
+app.delete('/api/user',(req,res)=>{
+  const { userId } = req.body;
+  userService.remove(userId)
+    .then(() => res.send(userId))
+    .catch((err) => {
+      loggerService.error("Cannot remove bug", err);
+      res.status(400).send("Cannot remove bug");
+    });
 })
 
 app.post('/api/auth/login', (req, res) => {

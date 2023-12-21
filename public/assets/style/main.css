@@ -68,7 +68,21 @@ nav a:hover {
     flex-wrap: wrap;
 }
 
+.user-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+}
+
 .bug-preview {
+    background-color: #333;
+    color: whitesmoke;
+    border-radius: .2em;
+    margin: 5px;
+    text-align: center;
+    padding: 5px;
+}
+.user-preview {
     background-color: #333;
     color: whitesmoke;
     border-radius: .2em;

@@ -2,7 +2,9 @@ import { bugService } from '../services/bug.service.js'
 import { utilService } from '../services/util.service.js'
 import { showSuccessMsg, showErrorMsg } from '../services/event-bus.service.js'
 import { BugList } from '../cmps/BugList.jsx'
+import { UserDetails } from './UserDetails.jsx'
 import { BugFilter } from "../cmps/BugFilter.jsx"
+import { userService } from "../services/user.service.js";
 
 const { useState, useEffect ,useRef } = React
 
