@@ -25,31 +25,69 @@ app.get("/api/bug", (req, res) => {
 });
 
 //Save
-app.get("/api/bug/save", (req, res) => {
+// app.get("/api/bug/save", (req, res) => {
+//   const bugToSave = {
+    // title: req.query.title,
+    // description: req.query.description,
+    // severity: +req.query.severity,
+    // _id: req.query._id,
+//   };
+
+//   bugService.save(bugToSave)
+//     .then((bug) => res.send(bug))
+//     .catch((err) => {
+//       loggerService.error("Cannot save bug", err);
+//       res.status(400).send("Cannot save bug");
+//     });
+// });
+
+// Add bug (CREATE)
+app.post('/api/bug', (req, res) => {
+  const { title, description, severity, labels } = req.body
+
   const bugToSave = {
-    title: req.query.title,
-    severity: +req.query.severity,
-    _id: req.query._id,
-  };
+      title,
+      description,
+      severity, //auto parse to num
+      labels: labels || []
+  }
 
   bugService.save(bugToSave)
-    .then((bug) => res.send(bug))
-    .catch((err) => {
-      loggerService.error("Cannot save bug", err);
-      res.status(400).send("Cannot save bug");
-    });
-});
+      .then(bug => res.send(bug))
+      .catch((err) => {
+          loggerService.error('Cannot save bug obj', err)
+          res.status(400).send('Cannot save bug obj')
+      })
+})
+
+// Edit bug (UPDATE)
+app.put('/api/bug', (req, res) => {
+  const { _id, title, description, severity, labels } = req.body
+  const bugToSave = {
+      _id,
+      title,
+      description,
+      severity, //auto parse to num
+      labels
+  }
+  bugService.save(bugToSave)
+      .then(bug => res.send(bug))
+      .catch((err) => {
+          loggerService.error('Cannot save bug', err)
+          res.status(400).send('Cannot save bug')
+      })
+})
 
 // Read - getById
 app.get("/api/bug/:bugId", (req, res) => {
   const { bugId } = req.params;
 
-  const { visitCountMap = [] } = req.cookies;
-  console.log("visitCountMap", visitCountMap);
-  if (visitCountMap.length >= 3)
+  const { visitCountBugs = [] } = req.cookies;
+  console.log("visitCountBugs", visitCountBugs);
+  if (visitCountBugs.length >= 3)
     return res.status(401).send("limit 3 bugs ");
-  if (!visitCountMap.includes(bugId)) visitCountMap.push(bugId);
-  res.cookie("visitCountMap", visitCountMap, { maxAge: 1000 * 7 });
+  if (!visitCountBugs.includes(bugId)) visitCountBugs.push(bugId);
+  res.cookie("visitCountBugs", visitCountBugs, { maxAge: 1000 * 7 });
 
   bugService.getById(bugId)
     .then((bug) => res.send(bug))
@@ -60,7 +98,7 @@ app.get("/api/bug/:bugId", (req, res) => {
 });
 
 // Remove
-app.get("/api/bug/:bugId/remove", (req, res) => {
+app.delete("/api/bug/:bugId", (req, res) => {
   const { bugId } = req.params;
   bugService
     .remove(bugId)

@@ -25,7 +25,7 @@ function getById(bugId) {
 
 function remove(bugId) {
     // return storageService.remove(STORAGE_KEY, bugId)
-    return axios.get(BASE_URL + bugId + '/remove')
+    return axios.delete(BASE_URL + bugId)
 }
 
 function save(bug) {
@@ -34,10 +34,12 @@ function save(bug) {
     // } else {
     //     return storageService.post(STORAGE_KEY, bug)
     // }
-    const url = BASE_URL + 'save'
-    let queryParams = `?title=${bug.title}&severity=${bug.severity}`
-    if (bug._id) queryParams += `&_id=${bug._id}`
-    return axios.get(url + queryParams)
+    // const url = BASE_URL + 'save'
+    // let queryParams = `?title=${bug.title}&description=${bug.description}&severity=${bug.severity}`
+    // if (bug._id) queryParams += `&_id=${bug._id}`
+    // return axios.get(url + queryParams)
+    const method = car._id ? 'put' : 'post'
+    return axios[method](BASE_URL, car).then(res => res.data)
 }
 
 
