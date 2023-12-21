@@ -51,7 +51,7 @@ export function BugIndex() {
 
     function onEditBug(bug) {
         const severity = +prompt('New severity?')
-        const description = +prompt('New description?')
+        const description = prompt('New description?')
         const bugToSave = { ...bug, severity, description }
         bugService
             .save(bugToSave)
